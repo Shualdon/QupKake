@@ -1,0 +1,12 @@
+#%Module
+set prefix /ihome/ghutchison/oda6/xtb
+
+module-whatis "Semiempirical Extended Tight-Binding Program Package"
+
+prepend-path XTBPATH $prefix/share/xtb
+prepend-path PATH $prefix/bin
+prepend-path MANPATH $prefix/share/man
+prepend-path PKG_CONFIG_PATH $prefix/lib64/pkgconfig
+
+# Only allow to load one instance of xtb
+conflict xtb

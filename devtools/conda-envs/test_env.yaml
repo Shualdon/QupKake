@@ -1,14 +1,25 @@
-name: test
+name: qupkake
 channels:
-
+  - pytorch
   - conda-forge
-
   - defaults
 dependencies:
     # Base depends
-  - python
+  - python=3.9
   - pip
-
+  - pytorch-cuda=11.8
+  - pytorch::pytorch==2.0
+  - torchmetrics  # modular ML metrics for PyTorch
+  - torchvision
+  - pytorch-lightning=2.0.2  # parallelisation
+  - pyg::pyg==2.3  # pytorch geometric
+  - pytorch-scatter::pyg
+  - pytorch-sparse::pyg
+  - pandas
+  - ipython
+  - jupyter
+  - ipykernel
+  - rdkit=2022.03.03
     # Testing
   - pytest
   - pytest-cov
