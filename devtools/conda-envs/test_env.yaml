@@ -20,12 +20,12 @@ dependencies:
     # Testing
   - pytest
   - pytest-cov
-  - codecov
+  #- codecov
 
     # Pip-only installs
   - pip:
     - torch_geometric==2.4
     # - torch-sparse
     # - torch-scatter
-    # - codecov
+    - codecov
 
