@@ -89,5 +89,3 @@ default-tag = "1.0.0"
 
 [tool.versioningit.write]
 file = "qupkake/_version.py"
-
-[tool.versioneer]
