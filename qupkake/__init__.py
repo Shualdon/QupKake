@@ -1,11 +1,7 @@
 """Predict micro-pKa of organic molecules"""
 
 # Add imports here
-from . import _version
+from ._version import get_versions
 from .qupkake import *
 
-print(_version.__file__)
-# from ._version import __version__
-__version__ = _version.get_versions()["version"]
-from . import _version
-__version__ = _version.get_versions()['version']
+__version__ = get_versions()["version"]
