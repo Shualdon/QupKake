@@ -8,7 +8,6 @@ dependencies:
     # Base depends
   - python=3.10
   - pip
-  - pytorch-cuda
   - pytorch::pytorch==2.1
   - torchmetrics 
   - torchvision
