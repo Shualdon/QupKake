@@ -2,6 +2,7 @@ include CODE_OF_CONDUCT.md
 include LICENSE
 include MANIFEST.in
 include versioneer.py
+include qupkake/xtb-641/*
 
 graft qupkake
 global-exclude *.py[cod] __pycache__ *.so
