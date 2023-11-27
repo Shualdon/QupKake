@@ -1,5 +1,6 @@
 name: qupkake
 channels:
+  - pyg
   - pytorch
   - conda-forge
   - defaults
@@ -11,9 +12,7 @@ dependencies:
   - torchvision
   - cudatoolkit
   - pytorch-lightning=2.1.0
-  - pyg::pyg==2.3
-  - pytorch-scatter::pyg
-  - pytorch-sparse::pyg
+  - pyg=2.4
   - pandas
   - ipython
   - jupyter
