@@ -106,4 +106,4 @@ ENV/
 *profraw
 
 # In-tree generated files
-*/_version.py
+#*/_version.py
