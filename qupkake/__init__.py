@@ -4,9 +4,5 @@
 from . import _version
 from .qupkake import *
 
-print(_version.__builtins__)
 # from ._version import __version__
 __version__ = _version.get_versions()["version"]
-
-from . import _version
-__version__ = _version.get_versions()['version']
