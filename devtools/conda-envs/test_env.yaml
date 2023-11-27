@@ -2,7 +2,6 @@ name: qupkake
 channels:
   - pytorch
   - conda-forge
-  - pyg
   - defaults
 dependencies:
     # Base depends
@@ -10,12 +9,13 @@ dependencies:
   - pip
   - pytorch-cuda=11.8
   - pytorch::pytorch==2.0
-  - torchmetrics  # modular ML metrics for PyTorch
+  - torchmetrics 
   - torchvision
-  - pytorch-lightning=2.0.2  # parallelisation
-  - pyg::pyg==2.3  # pytorch geometric
-  - pytorch-scatter::pyg
-  - pytorch-sparse::pyg
+  - cudatoolkit
+  - pytorch-lightning=2.0.2 
+  # - pyg::pyg==2.3
+  # - pytorch-scatter::pyg
+  # - pytorch-sparse::pyg
   - pandas
   - ipython
   - jupyter
@@ -27,6 +27,9 @@ dependencies:
   - codecov
 
     # Pip-only installs
-  #- pip:
+  - pip:
+    - torch-geometric==2.3
+    - torch-sparse
+    - torch-scatter
   #  - codecov
 
