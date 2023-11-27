@@ -25,7 +25,7 @@ dependencies:
     # Pip-only installs
   - pip:
     - torch_geometric==2.4
-    - torch-sparse
-    - torch-scatter
+    # - torch-sparse
+    # - torch-scatter
     # - codecov
 
