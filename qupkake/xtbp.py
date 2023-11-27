@@ -36,7 +36,6 @@ class RunXTB:
         Raises:
             RuntimeError:  If the xTB executable does not exist.
         """
-        print(os.listdir(os.path.dirname(__file__)))
         if not os.path.exists(XTB_LOCATION):
             raise RuntimeError(f'xTB exectuable in: "{XTB_LOCATION}" does not exists.')
 
