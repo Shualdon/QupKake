@@ -1,5 +1,6 @@
 [build-system]
-requires = ["setuptools>=61.0", "versioneer[toml]"]
+#requires = ["setuptools>=61.0", "versioneer[toml]"]
+requires = ["setuptools>=61.0", "versioningit~=2.0", "versioneer[toml]"]
 build-backend = "setuptools.build_meta"
 
 # Self-descriptive entries which should always be present
@@ -23,6 +24,19 @@ requires-python = ">=3.9"
 dependencies = [
     "importlib-resources;python_version<'3.10'",
     "tomli; python_version < '3.11'",
+    "numpy>=1.25.2",
+    "scipy>=1.11",
+    "pandas>=2.1.0",
+    "scikit-learn>=1.2.2",
+    "torch>=2.1",
+    "torchvision>=0.10.0",
+    "pytorch-lightning>=2.1",
+    "matplotlib>=3.4.3",
+    "seaborn>=0.13.0",
+    "tqdm>=4.65.0",
+    "torch_geometric>=2.4.0",
+    "torchmetrics>=1.2.0",
+    "rdkit>=2023.09.1",
 ]
 
 # Update the urls once the hosting is set up.
