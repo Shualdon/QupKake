@@ -5,6 +5,7 @@ channels:
   - defaults
 dependencies:
     # Base depends
+  - python
   - pip
   - pytorch::pytorch==2.1
   - torchmetrics 
@@ -13,9 +14,8 @@ dependencies:
   - pytorch-lightning=2.1.0
   # - pyg=2.4
   - pandas
-  - ipython
-  - jupyter
-  - ipykernel
+  - numpy
+  - scipy
   - rdkit=2022.03.03
     # Testing
   - pytest
