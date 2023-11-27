@@ -39,6 +39,7 @@ dependencies = [
     "rdkit>=2023.09.1",
 ]
 
+
 # Update the urls once the hosting is set up.
 [project.urls]
 "Source" = "https://github.com/shualdon/qupkake/"
@@ -80,6 +81,9 @@ where = ["."]
 qupkake = [
     "py.typed"
 ]
+
+[tool.setuptools.dynamic]
+version = {attr = "package.__version__"}
 
 [tool.versioningit]
 default-version = "1+unknown"
