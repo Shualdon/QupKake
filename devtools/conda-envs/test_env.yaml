@@ -1,21 +1,19 @@
 name: qupkake
 channels:
   - pytorch
-  - nvidia
   - conda-forge
   - defaults
 dependencies:
     # Base depends
-  - python=3.10
   - pip
   - pytorch::pytorch==2.1
   - torchmetrics 
   - torchvision
   - cudatoolkit
   - pytorch-lightning=2.1.0
-  # - pyg::pyg==2.3
-  # - pytorch-scatter::pyg
-  # - pytorch-sparse::pyg
+  - pyg::pyg==2.3
+  - pytorch-scatter::pyg
+  - pytorch-sparse::pyg
   - pandas
   - ipython
   - jupyter
@@ -27,9 +25,9 @@ dependencies:
   - codecov
 
     # Pip-only installs
-  - pip:
-    - torch-geometric==2.3
-    - torch-sparse
-    - torch-scatter
-  #  - codecov
+  # - pip:
+    # - torch_geometric==2.3
+    # - torch-sparse
+    # - torch-scatter
+    # - codecov
 
