@@ -9,8 +9,6 @@ from typing import Any, Union
 
 from rdkit import Chem
 
-print(os.listdir(os.path.dirname(__file__)))
-
 XTB_LOCATION = os.environ.get("XTBPATH") or os.path.join(
     os.path.dirname(__file__), "xtb-641/bin/xtb"
 )
@@ -38,6 +36,7 @@ class RunXTB:
         Raises:
             RuntimeError:  If the xTB executable does not exist.
         """
+        print(os.listdir(os.path.dirname(__file__)))
         if not os.path.exists(XTB_LOCATION):
             raise RuntimeError(f'xTB exectuable in: "{XTB_LOCATION}" does not exists.')
 
