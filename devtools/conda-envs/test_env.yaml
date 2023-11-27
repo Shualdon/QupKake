@@ -8,12 +8,12 @@ dependencies:
     # Base depends
   - python=3.10
   - pip
-  - pytorch-cuda=12.2
+  - pytorch-cuda
   - pytorch::pytorch==2.1
   - torchmetrics 
   - torchvision
   - cudatoolkit
-  - pytorch-lightning=2.0.2 
+  - pytorch-lightning=2.1.0
   # - pyg::pyg==2.3
   # - pytorch-scatter::pyg
   # - pytorch-sparse::pyg
