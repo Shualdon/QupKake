@@ -6,16 +6,52 @@ from ._version import get_versions
 __version__ = get_versions()["version"]
 
 
+class MyParser(argparse.ArgumentParser):
+    """
+    Overriden to show help on default.
+    """
+
+    def error(self, message):
+        print(f"error: {message}")
+        self.print_help()
+        sys.exit(2)
+
+
 def main_file(args):
     print(args)
 
 
 def main_smiles(args):
+    from importlib import resources as impresources
+
+    from . import models
+
+    models = impresources.files(models)
+    print(models)
+
     print(args)
 
 
+def create_dirs(args):
+    """
+    Creates the directory structure for the project.
+    """
+    import os
+
+    root = args.root
+    dirs = [
+        os.path.join(root, "raw"),
+        os.path.join(root, "processed"),
+        os.path.join(root, "molecules"),
+        os.path.join(root, "output"),
+    ]
+
+    for d in dirs:
+        os.makedirs(d, exist_ok=True)
+
+
 def parse_arguments(args):
-    gen_parser = argparse.ArgumentParser(
+    gen_parser = MyParser(
         add_help=False,
     )
 
@@ -44,7 +80,7 @@ def parse_arguments(args):
         "-v", "--version", action="version", version="%(prog)s " + __version__
     )
 
-    parser = argparse.ArgumentParser(
+    parser = MyParser(
         prog="qupkake",
         description="QupKake: Quantum pKa graph-neural-network Estimator",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
