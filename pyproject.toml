@@ -89,8 +89,8 @@ method = "git"  # <- The method name
 match = ["*"]
 default-tag = "1.0.0"
 
-[tool.versioningit.write]
-file = "qupkake/_version.py"
+#[tool.versioningit.write]
+#file = "qupkake/_version.py"
 
 [tool.versioneer]
 VCS = "git"
@@ -100,3 +100,5 @@ versionfile_build = "qupkake/_version.py"
 tag_prefix = ""
 parentdir_prefix = "qupkake-"
 
+[project.scripts]
+qupkake = "qupkake.cli:main"
