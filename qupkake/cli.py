@@ -17,24 +17,189 @@ class MyParser(argparse.ArgumentParser):
         sys.exit(2)
 
 
+def embed_molecule(mol):
+    """
+    Embeds a molecule.
+
+    Parameters
+    ----------
+    mol : rdkit.Chem.rdchem.Mol
+        Molecule.
+
+    Returns
+    -------
+    rdkit.Chem.rdchem.Mol
+        Embedded molecule.
+    """
+    from rdkit import Chem
+    from rdkit.Chem import AllChem
+
+    c = mol.GetConformer()
+    if c.Is3D():
+        return mol
+
+    mol = Chem.AddHs(mol)
+    AllChem.EmbedMolecule(mol)
+    AllChem.MMFFOptimizeMolecule(mol)
+
+    return mol
+
+
+def process_file(filename, smiles_col, name_col, root):
+    """
+    Processes a CSV or SDF file.
+
+    Parameters
+    ----------
+    filename : str
+        Input file (CSV or SDF).
+    smiles_col : str
+        Column name with SMILES strings.
+    name_col : str
+        Column name with molecule names.
+    root : str
+        Root directory for processing data.
+
+    Returns
+    -------
+    str
+        Path to the SDF file with the embedded molecules.
+    """
+    import os
+    import warnings
+    from pathlib import Path
+
+    import pandas as pd
+    from rdkit.Chem import PandasTools
+
+    if filename.endswith(".csv"):
+        df = pd.read_csv(filename)
+        if smiles_col not in df.columns:
+            raise ValueError("Invalid CSV file. No SMILES column found.")
+
+        PandasTools.AddMoleculeColumnToFrame(df, smiles_col)
+        df["ROMol"] = df["ROMol"].apply(lambda x: embed_molecule(x))
+
+    elif filename.endswith(".sdf"):
+        df = PandasTools.LoadSDF(
+            filename,
+            idName=name_col,
+            includeFingerprints=False,
+            removeHs=False,
+            embedProps=True,
+        )
+    else:
+        raise ValueError("Invalid file type.")
+
+    if name_col not in df.columns:
+        df[name_col] = f"molecule_{df.index + 1}"
+    filename = Path(filename).stem
+    file_path = f"{root}/raw/{filename}.sdf"
+    if os.path.exists(file_path):
+        i = 1
+        file_path = f"{root}/raw/{filename}_{i}.sdf"
+        while os.path.exists(file_path):
+            i += 1
+            file_path = f"{root}/raw/{filename}_{i}.sdf"
+        warnings.warn(
+            f"File {root}/raw/{filename}.sdf already exists.\n"
+            "A new file will be created with a different name.\n"
+            "Please delete the existing file if you want to overwrite it."
+        )
+        filename = filename + f"_{i}"
+
+    PandasTools.WriteSDF(
+        df,
+        file_path,
+        idName=name_col,
+        properties=list(df.columns),
+    )
+
+    return filename
+
+
 def main_file(args):
+    """
+    Predicts the pKa values for a list of molecules in a CSV or SDF file.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Command line arguments.
+    """
+
+    create_dirs(args)
+    process_file(args.filename, args.smiles_col, args.name_col, args.root)
+
+    # TODO: Implement
+    # run the pipeline
+    # check if the output file exists
+    #   if yes, create a new output file with a different name (e.g. qupkake_output_1.csv)
+    # save the results to the output directory
     print(args)
 
 
 def main_smiles(args):
-    from importlib import resources as impresources
+    """
+    Predicts the pKa values for a SMILES string.
 
-    from . import models
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Command line arguments.
+    """
 
-    models = impresources.files(models)
-    print(models)
+    create_dirs(args)
+    smiles_to_sdf(args.smiles, args.name, args.root)
 
+    # TODO: Implement
+    # run the pipeline
+    # check if the output file exists
+    #   if yes, create a new output file with a different name (e.g. qupkake_output_1.csv)
+    # save the results to the output directory
     print(args)
+
+
+def smiles_to_sdf(smiles, name, root) -> None:
+    """
+    Converts a SMILES string to a SDF file.
+
+    Parameters
+    ----------
+    smiles : str
+        SMILES string.
+    name : str
+        Name of the molecule.
+    root : str
+        Root directory for processing data.
+
+    Returns
+    -------
+    None
+    """
+    from rdkit import Chem
+    from rdkit.Chem import SDWriter
+
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        raise ValueError("Invalid SMILES string.")
+
+    mol = embed_molecule(mol)
+
+    mol.SetProp("_Name", name)
+    writer = SDWriter(f"{root}/raw/{name}.sdf")
+    writer.write(mol)
+    writer.close()
 
 
 def create_dirs(args):
     """
     Creates the directory structure for the project.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Command line arguments.
     """
     import os
 
@@ -51,12 +216,19 @@ def create_dirs(args):
 
 
 def parse_arguments(args):
+    """
+    Parses the command line arguments.
+    """
     gen_parser = MyParser(
         add_help=False,
     )
 
     gen_parser.add_argument(
-        "--root", type=str, default="data", help="Root directory for processing data."
+        "-r",
+        "--root",
+        type=str,
+        default="data",
+        help="Root directory for processing data.",
     )
 
     gen_parser.add_argument(
