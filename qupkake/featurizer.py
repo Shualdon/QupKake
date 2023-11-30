@@ -499,7 +499,8 @@ class Featurizer:
             )
             xtbp = XTBP(xtb_out())
             mol_attributes = xtbp()
-            self.mol = xtb_out.get_opt_mol()
+
+            #self.mol = xtb_out.get_opt_mol()
 
             fukui_out = RunXTB(self.mol, "--vfukui")
             fukui = XTBP(fukui_out())

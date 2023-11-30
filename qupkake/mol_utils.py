@@ -151,7 +151,7 @@ class Tautomerize:
 
     def make_tautomer_files(self) -> None:
         """Create tautomer files, run GNF2-xTB, and parse the total energy"""
-        os.makedirs(self.mol_dir, exist_ok=True)
+        #os.makedirs(self.mol_dir, exist_ok=True)
         tautomer_energy = []
         with tempfile.TemporaryDirectory() as tmpdirname:
             for i, taut in enumerate(self.tautomers):

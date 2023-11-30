@@ -92,8 +92,8 @@ class MolDatasetAbstract(Dataset, ABC):
         self.num_processes = (
             multiprocessing.cpu_count() if isinstance(self.mp, bool) else self.mp
         )
-        os.makedirs(f"timing/{self.num_processes}", exist_ok=True)
         self.data = None
+        self.data_list = []
         super().__init__(root, transform, pre_transform, **kwargs)
 
     def _read_file(self, embed=False):
@@ -196,7 +196,7 @@ class MolDatasetAbstract(Dataset, ABC):
     def process(self):
         """Process the dataset to the processed data folder."""
         self.data = self._get_data(embed=True)
-        self.data_list = []
+
         if self.mp:
             chunks = np.array_split(self.data, self.num_processes)
             with Pool(self.num_processes) as pool:
@@ -221,7 +221,7 @@ class MolDatasetAbstract(Dataset, ABC):
     def _load_processed_data(self, file_name):
         """Load processed data from file"""
         file_path = os.path.join(self.processed_dir, file_name)
-        self.data_list.append(torch.load(file_path))
+        return torch.load(file_path)
 
     @abstractmethod
     def _process_chunk(self, chunk):
@@ -460,11 +460,11 @@ class MolPairDataset(MolDatasetAbstract):
 
         # Get mol graph
         try:
-            mol_graph = MolFeaturizer(
+            mol_graph = Featurizer(
                 mol=mol, name=f"{name}", num_processes=self.num_processes, **self.kwargs
             ).data
             conjugate_mol = self._conjugate_mol(mol, atom_index, pka_type)
-            conjugate_graph = MolFeaturizer(
+            conjugate_graph = Featurizer(
                 mol=conjugate_mol,
                 name=f"{name}_c{atom_index}",
                 y=y,
@@ -638,12 +638,13 @@ class MolDataset(MolDatasetAbstract):
                 check_exists=False,
                 keep_mol=False,
                 num_processes=self.num_processes,
+                #mol_dir=os.path.join(self.root, "molecules"),
                 **self.kwargs,
             )
             mol = tautomers.lowest_tautomer
             name = tautomers.lowest_tautomer_name
 
-        mol_data = MolFeaturizer(
+        mol_data = Featurizer(
             mol=mol,
             name=name,
             y=y,
@@ -685,4 +686,4 @@ class MolDataset(MolDatasetAbstract):
             file_name = f"{name}_{self.data_name}.pt"
         else:
             file_name = f"{name}.pt"
-        return _load_processed_data(file_name)
+        return self._load_processed_data(file_name)

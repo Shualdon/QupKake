@@ -34,9 +34,9 @@ def embed_molecule(mol):
     from rdkit import Chem
     from rdkit.Chem import AllChem
 
-    c = mol.GetConformer()
-    if c.Is3D():
-        return mol
+    if mol.GetNumConformers() > 0:
+        if mol.GetConformer().Is3D():
+            return mol
 
     mol = Chem.AddHs(mol)
     AllChem.EmbedMolecule(mol)
@@ -45,7 +45,7 @@ def embed_molecule(mol):
     return mol
 
 
-def process_file(filename, smiles_col, name_col, root):
+def process_file(filename: str, smiles_col: str, name_col: str, root: str) -> str:
     """
     Processes a CSV or SDF file.
 
@@ -104,7 +104,7 @@ def process_file(filename, smiles_col, name_col, root):
         warnings.warn(
             f"File {root}/raw/{filename}.sdf already exists.\n"
             "A new file will be created with a different name.\n"
-            "Please delete the existing file if you want to overwrite it."
+            "Please delete the existing file if you want to overwrite it.",
         )
         filename = filename + f"_{i}"
 
@@ -115,7 +115,45 @@ def process_file(filename, smiles_col, name_col, root):
         properties=list(df.columns),
     )
 
-    return filename
+    return filename + ".sdf"
+
+
+def check_output_file(filename: str, root: str) -> str:
+    """
+    Checks if the output file exists.
+
+    Parameters
+    ----------
+    filename : str
+        Output file.
+    root : str
+        Root directory for processing data.
+
+    Returns
+    -------
+    str
+        Path to the output file.
+    """
+    import os
+    import warnings
+    from pathlib import Path
+
+    filename = Path(filename).stem
+    file_path = f"{root}/output/{filename}.sdf"
+    if os.path.exists(file_path):
+        i = 1
+        file_path = f"{root}/output/{filename}_{i}.sdf"
+        while os.path.exists(file_path):
+            i += 1
+            file_path = f"{root}/output/{filename}_{i}.sdf"
+        warnings.warn(
+            f"File {root}/output/{filename}.sdf already exists.\n"
+            "A new file will be created with a different name.\n"
+            "Please delete the existing file if you want to overwrite it.",
+        )
+        filename = filename + f"_{i}"
+
+    return filename + ".sdf"
 
 
 def main_file(args):
@@ -129,14 +167,11 @@ def main_file(args):
     """
 
     create_dirs(args)
-    process_file(args.filename, args.smiles_col, args.name_col, args.root)
-
-    # TODO: Implement
-    # run the pipeline
-    # check if the output file exists
-    #   if yes, create a new output file with a different name (e.g. qupkake_output_1.csv)
-    # save the results to the output directory
-    print(args)
+    args.filename = process_file(
+        args.filename, args.smiles_col, args.name_col, args.root
+    )
+    args.mol_col = "ROMol"
+    run_pipeline(args)
 
 
 def main_smiles(args):
@@ -151,13 +186,10 @@ def main_smiles(args):
 
     create_dirs(args)
     smiles_to_sdf(args.smiles, args.name, args.root)
-
-    # TODO: Implement
-    # run the pipeline
-    # check if the output file exists
-    #   if yes, create a new output file with a different name (e.g. qupkake_output_1.csv)
-    # save the results to the output directory
-    print(args)
+    args.filename = args.name + ".sdf"
+    args.mol_col = "ROMol"
+    args.name_col = "name"
+    run_pipeline(args)
 
 
 def smiles_to_sdf(smiles, name, root) -> None:
@@ -213,6 +245,22 @@ def create_dirs(args):
 
     for d in dirs:
         os.makedirs(d, exist_ok=True)
+
+
+def run_pipeline(args):
+    """
+    Runs the pipeline.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Command line arguments.
+    """
+    from .predict import run_prediction_pipeline
+
+    args.output = check_output_file(args.output, args.root)
+    args.mp = args.multiprocessing
+    run_prediction_pipeline(**vars(args))
 
 
 def parse_arguments(args):
@@ -276,8 +324,8 @@ def parse_arguments(args):
     parser_file.add_argument(
         "-o",
         "--output",
-        help="Output file (CSV with pKa predictions)",
-        default="qupkake_output.csv",
+        help="Output file (SDF with pKa predictions)",
+        default="qupkake_output.sdf",
     )
     parser_file.add_argument(
         "-s", "--smiles-col", help="Column name with SMILES strings", default="smiles"
@@ -304,8 +352,8 @@ def parse_arguments(args):
     parser_smiles.add_argument(
         "-o",
         "--output",
-        help="Output file (CSV with pKa predictions)",
-        default="qupkake_output.csv",
+        help="Output file (SDF with pKa predictions)",
+        default="qupkake_output.sdf",
     )
     parser_smiles.set_defaults(func=main_smiles)
 

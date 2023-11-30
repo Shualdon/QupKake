@@ -155,9 +155,11 @@ class RunXTB:
                 if process.stderr == "abnormal termination of xtb":
                     raise RuntimeError("Problem running xtb on molecule")
                 else:
-                    if "--opt" in self.options:
+                    if "--opt" in self.options.split():
                         self.opt_done = True
-                        self.opt_mol = self._get_mol_from_file(filepath)
+                        # self.opt_mol = self._get_mol_from_file(
+                        #     os.path.join(tmpdirname, "xtbtopo.mol")
+                        # )
 
             except CalledProcessError as exc:
                 os.chdir(working_dir)

@@ -1,8 +1,6 @@
-import functools
-import glob
+import logging
 import os
-import shutil
-import sys
+import warnings
 from importlib import resources as impresources
 from typing import Tuple, Union
 
@@ -10,15 +8,23 @@ import pandas as pd
 import pytorch_lightning as pl
 import torch
 from rdkit.Chem import PandasTools
-from torch_geometric.data import Data
 from torch_geometric.loader import DataLoader
 from torch_geometric.transforms import Compose, NormalizeFeatures
 
-from . import models
 from .mol_dataset import MolDataset, MolPairDataset
 from .pka_models import PredictpKa
 from .sites_models import SitesPrediction
 from .transforms import IncludeEnergy, ToTensor
+
+warnings.filterwarnings(
+    "ignore", ".*Consider increasing the value of the `num_workers` argument*"
+)
+
+warnings.filterwarnings("ignore", ".*If your intention is to run Lightning on SLURM*")
+
+log = logging.getLogger("pytorch_lightning")
+log.propagate = False
+log.setLevel(logging.ERROR)
 
 
 def load_mol_dataset(
@@ -26,7 +32,7 @@ def load_mol_dataset(
     filename: str,
     tautomerize: bool,
     name_col: str,
-    smiles_col: str,
+    mol_col: str,
     mp: Union[bool, int],
 ) -> MolDataset:
     """Load a dataset of molecules.
@@ -36,7 +42,7 @@ def load_mol_dataset(
         filename (str): filename of the dataset
         tautomerize (bool): whether to tautomerize the molecules
         name_col (str): name of the column with the molecule name
-        smiles_col (str): name of the column with the SMILES
+        mol_col (str): name of the column with the molecule
         mp (Union[bool, int]): number of processes to use for multiprocessing
 
     Returns:
@@ -47,7 +53,7 @@ def load_mol_dataset(
         filename=filename,
         tautomerize=tautomerize,
         name_col=name_col,
-        smiles_col=smiles_col,
+        mol_col=mol_col,
         mp=mp,
     )
     return dataset
@@ -91,7 +97,7 @@ def load_mol_pair_dataset(
         mol_col=mol_col,
         idx_col=idx_col,
         type_col=type_col,
-        type_values=("protonate", "deprotonate"),
+        type_values=("basic", "acidic"),
         xtb=True,
         mp=mp,
         transform=transforms,
@@ -106,16 +112,19 @@ def load_models() -> Tuple[SitesPrediction, SitesPrediction, PredictpKa]:
     Returns:
         Tuple[SitesPrediction, SitesPrediction, PredictpKa]: protonation model, deprotonation model, pKa model
     """
-    models = impresources.files(models)
+    from . import models
+
+    models_path = impresources.files(models)
     prot_model = SitesPrediction.load_from_checkpoint(
-        os.path.join(models, "protonation_model.ckpt"), map_location=torch.device("cpu")
+        os.path.join(models_path, "protonation_model.ckpt"),
+        map_location=torch.device("cpu"),
     )
     deprot_model = SitesPrediction.load_from_checkpoint(
-        os.path.join(models, "deprotonation_model.ckpt"),
+        os.path.join(models_path, "deprotonation_model.ckpt"),
         map_location=torch.device("cpu"),
     )
     pka_model = PredictpKa.load_from_checkpoint(
-        os.path.join(models, "pka_model.ckpt"), map_location=torch.device("cpu")
+        os.path.join(models_path, "pka_model.ckpt"), map_location=torch.device("cpu")
     )
     return prot_model, deprot_model, pka_model
 
@@ -162,10 +171,10 @@ def predict_pka(dataset: MolPairDataset, model: PredictpKa) -> torch.Tensor:
         accelerator="cpu",
         devices=1,
     )
-
     pka_predictions = trainer.predict(
         model, DataLoader(dataset, batch_size=1, follow_batch=["x_deprot", "x_prot"])
     )
+    pka_predictions = torch.cat(pka_predictions).squeeze()
     return pka_predictions
 
 
@@ -191,7 +200,7 @@ def make_sites_prediction_files(
     mol_list = []
     for data, prot_idx, deprot_idx in zip(dataset, prot_indices, deprot_indices):
         data_dict = {}
-        data_dict["mol"] = data.mol
+        data_dict["ROMol"] = data.mol
         data_dict["name"] = data.name
         for i in prot_idx:
             prot_dict = data_dict.copy()
@@ -205,9 +214,63 @@ def make_sites_prediction_files(
             mol_list.append(deprot_dict)
     PandasTools.WriteSDF(
         pd.DataFrame(mol_list),
-        f"{root}/raw/{output}.sdf",
+        f"{root}/raw/{output}",
         molColName="ROMol",
         idName="name",
         properties=["idx", "pka_type"],
     )
 
+
+def run_prediction_pipeline(
+    root: str,
+    filename: str,
+    tautomerize: bool,
+    name_col: str,
+    mol_col: str,
+    mp: Union[bool, int],
+    output: str,
+    **kwargs,
+) -> None:
+    """Run the prediction pipeline."""
+    dataset = load_mol_dataset(
+        root=root,
+        filename=filename,
+        tautomerize=tautomerize,
+        name_col=name_col,
+        mol_col=mol_col,
+        mp=mp,
+    )
+    prot_model, deprot_model, pka_model = load_models()
+    prot_indices = predict_sites(dataset, prot_model)
+    deprot_indices = predict_sites(dataset, deprot_model)
+    make_sites_prediction_files(root, dataset, prot_indices, deprot_indices, output)
+    pair_dataset = load_mol_pair_dataset(
+        root=root,
+        filename=output,
+        name_col=name_col,
+        mol_col="ROMol",
+        idx_col="idx",
+        type_col="pka_type",
+        mp=mp,
+    )
+
+    pka_predictions = predict_pka(pair_dataset, pka_model)
+    df = PandasTools.LoadSDF(
+        f"{root}/raw/{output}",
+        embedProps=True,
+        removeHs=False,
+        includeFingerprints=False,
+        idName=name_col,
+        molColName="ROMol",
+    )
+    df["pka"] = pka_predictions
+
+    PandasTools.WriteSDF(
+        df,
+        f"{root}/output/{output}",
+        molColName="ROMol",
+        idName=name_col,
+        properties=["idx", "pka_type", "pka"],
+    )
+
+    print(f"Predictions saved to {root}/output/{output}")
