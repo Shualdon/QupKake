@@ -25,7 +25,17 @@ requires-python = ">=3.9"
 dependencies = [
     "importlib-resources;python_version<'3.10'",
     "tomli; python_version < '3.11'",
-]
+    "pytorch>=2.0",
+    "pytorch-lightning>=2.0.2",
+    "torchmetrics; python_version>='3.9'",
+    "torchvision; python_version>='3.9'",
+    "cudatoolkit; python_version>='3.9'",
+    "numpy>=1.25",
+    "pandas>=2.1",
+    "rdkit>=2022.03.3",
+    "scipy>=1.11",
+    "torch-geometric>=2.3",
+]   
 
 
 # Update the urls once the hosting is set up.
