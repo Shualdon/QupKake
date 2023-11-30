@@ -29,7 +29,6 @@ dependencies = [
     "pytorch-lightning>=2.0.2",
     "torchmetrics; python_version>='3.9'",
     "torchvision; python_version>='3.9'",
-    "cudatoolkit; python_version>='3.9'",
     "numpy>=1.25",
     "pandas>=2.1",
     "rdkit>=2022.03.3",

@@ -10,7 +10,6 @@ dependencies:
   - pytorch::pytorch==2.1
   - torchmetrics 
   - torchvision
-  - cudatoolkit
   - pytorch-lightning=2.1.0
   # - pyg=2.4
   - pandas
