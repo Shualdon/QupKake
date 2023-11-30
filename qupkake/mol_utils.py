@@ -1,17 +1,12 @@
 import glob
-import io
 import os
 import pathlib
-import re
 import shutil
 import tempfile
 import traceback
 from copy import deepcopy
-from itertools import groupby
-from subprocess import DEVNULL, PIPE, run
-from typing import Any, List, Optional, Tuple, Union
+from typing import  List, Optional,  Union
 
-import rdkit
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem.MolStandardize import rdMolStandardize
@@ -151,10 +146,13 @@ class Tautomerize:
 
     def make_tautomer_files(self) -> None:
         """Create tautomer files, run GNF2-xTB, and parse the total energy"""
+        from tqdm import tqdm
         #os.makedirs(self.mol_dir, exist_ok=True)
         tautomer_energy = []
         with tempfile.TemporaryDirectory() as tmpdirname:
-            for i, taut in enumerate(self.tautomers):
+            pbar = tqdm(enumerate(self.tautomers), total=len(self.tautomers))
+            for i, taut in pbar:
+                pbar.set_description(f"Processing {self.name} tautomer {i}")
                 taut_file = f"{tmpdirname}/{self.name}_t{i}.mol"
                 Chem.MolToMolFile(taut, taut_file)
                 xtb_out = RunXTB(

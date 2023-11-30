@@ -243,34 +243,38 @@ def run_prediction_pipeline(
     prot_model, deprot_model, pka_model = load_models()
     prot_indices = predict_sites(dataset, prot_model)
     deprot_indices = predict_sites(dataset, deprot_model)
-    make_sites_prediction_files(root, dataset, prot_indices, deprot_indices, output)
-    pair_dataset = load_mol_pair_dataset(
-        root=root,
-        filename=output,
-        name_col=name_col,
-        mol_col="ROMol",
-        idx_col="idx",
-        type_col="pka_type",
-        mp=mp,
-    )
+    if len(prot_indices) == 0 and len(deprot_indices) == 0:
+        print("No protonation/deprotonation sites were found.")
+        print("Output fill will not be created.")
+    else:
+        make_sites_prediction_files(root, dataset, prot_indices, deprot_indices, output)
+        pair_dataset = load_mol_pair_dataset(
+            root=root,
+            filename=output,
+            name_col=name_col,
+            mol_col="ROMol",
+            idx_col="idx",
+            type_col="pka_type",
+            mp=mp,
+        )
 
-    pka_predictions = predict_pka(pair_dataset, pka_model)
-    df = PandasTools.LoadSDF(
-        f"{root}/raw/{output}",
-        embedProps=True,
-        removeHs=False,
-        includeFingerprints=False,
-        idName=name_col,
-        molColName="ROMol",
-    )
-    df["pka"] = pka_predictions
+        pka_predictions = predict_pka(pair_dataset, pka_model)
+        df = PandasTools.LoadSDF(
+            f"{root}/raw/{output}",
+            embedProps=True,
+            removeHs=False,
+            includeFingerprints=False,
+            idName=name_col,
+            molColName="ROMol",
+        )
+        df["pka"] = pka_predictions
 
-    PandasTools.WriteSDF(
-        df,
-        f"{root}/output/{output}",
-        molColName="ROMol",
-        idName=name_col,
-        properties=["idx", "pka_type", "pka"],
-    )
+        PandasTools.WriteSDF(
+            df,
+            f"{root}/output/{output}",
+            molColName="ROMol",
+            idName=name_col,
+            properties=["idx", "pka_type", "pka"],
+        )
 
-    print(f"Predictions saved to {root}/output/{output}")
+        print(f"Predictions saved to {root}/output/{output}")
