@@ -19,11 +19,22 @@ Chemistry for micro-pKa Predictions]().
 * pytorch_geometric >= 2.3.0
 * pytorch_lightning >= 2.0.2
 * rdkit >= 2022.03.03
-* xTB 2.4.1 (included in this package)
+* xTB == 2.4.1
 
 # Installation
 
 We recommend using [conda](https://docs.conda.io/en/latest/) to install QupKake.
+
+## Option 1
+Create a conda environment from the environment.yml file:
+```bash
+conda env create -f environment.yml
+conda activate qupkake
+```
+This will create a conda environment with all the dependencies installed.
+
+## Option 2
+Manual installation:
 
 Create a conda environment:
 ```bash
@@ -31,13 +42,30 @@ conda create -n qupkake python=3.9
 conda activate qupkake
 ```
 
+`xtb` needs to be installed using conda:
+```bash
+conda install -c conda-forge xtb==6.4.1
+```
+See [xtb Installation](#xtb-installation) below for other installation options.
+
 Clone the repository and install using pip:
 ```bash
 git clone https://github.com/Shualdon/QupKake.git
 cd qupkake
 pip install .
 ```
-This will install the package and all the dependencies.
+This will install the package and all the rest of the dependencies.
+
+## `xtb` Installation
+
+Optionally, `xtb` can be installed from [source](https://github.com/grimme-lab/xtb/releases/tag/v6.4.1), and the path to the executable can be set up:
+```bash
+export XTBPATH=/path/to/xtb/executable
+```
+This be used even if `xtb` is installed using conda.
+
+
+The linux binaries of `xtb` come with the package and will be used by default if the neither the conda package or the `$XTB_PATH` enviroment variable are set up.
 
 # Usage
 Qupkake can be used as a python package or as a command line tool. This gives the user the flexibility to use the package in their own code or to use it as a stand-alone tool. 

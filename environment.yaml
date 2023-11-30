@@ -1,0 +1,24 @@
+name: qupkake
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - pytorch::pytorch==2.1
+  - torchmetrics 
+  - torchvision
+  - cudatoolkit
+  - pytorch-lightning=2.1.0
+  - pandas
+  - numpy
+  - scipy
+  - rdkit=2022.03.03
+  - xtb==6.4.1
+
+  - pip:
+    - torch_geometric==2.4
+    # - torch-sparse
+    # - torch-scatter
+

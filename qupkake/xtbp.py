@@ -9,9 +9,21 @@ from typing import Any, Union
 
 from rdkit import Chem
 
-XTB_LOCATION = os.environ.get("XTBPATH") or os.path.join(
-    os.path.dirname(__file__), "xtb-641/bin/xtb"
-)
+try:
+    import xtb
+
+    XTB_LOCATION = (
+        os.environ.get("XTBPATH")
+        or xtb
+        or os.path.join(os.path.dirname(__file__), "xtb-641/bin/xtb")
+    )
+except ImportError:
+    XTB_LOCATION = os.environ.get("XTBPATH") or os.path.join(
+        os.path.dirname(__file__), "xtb-641/bin/xtb"
+    )
+finally:
+    if not os.path.exists(XTB_LOCATION):
+        raise RuntimeError(f'xTB exectuable in: "{XTB_LOCATION}" does not exists.')
 
 
 class RunXTB:
