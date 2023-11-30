@@ -25,7 +25,7 @@ requires-python = ">=3.9"
 dependencies = [
     "importlib-resources;python_version<'3.10'",
     "tomli; python_version < '3.11'",
-    "pytorch>=2.0",
+    "torch>=2.0",
     "pytorch-lightning>=2.0.2",
     "torchmetrics; python_version>='3.9'",
     "torchvision; python_version>='3.9'",
