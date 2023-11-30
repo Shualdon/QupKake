@@ -239,13 +239,17 @@ def create_dirs(args):
     dirs = [
         os.path.join(root, "raw"),
         os.path.join(root, "processed"),
-        os.path.join(root, "molecules"),
+        #os.path.join(root, "molecules"),
         os.path.join(root, "output"),
     ]
 
     for d in dirs:
         os.makedirs(d, exist_ok=True)
 
+    # if process is not empty, delete all files in processed
+    if os.listdir(dirs[1]):
+        for f in os.listdir(dirs[1]):
+            os.remove(os.path.join(dirs[1], f))
 
 def run_pipeline(args):
     """

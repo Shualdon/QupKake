@@ -554,6 +554,13 @@ class MolDataset(MolDatasetAbstract):
         self.other_cols = other_cols
         self.mp = mp
         self.kwargs = kwargs
+
+        logging.basicConfig(
+            filename="error_log.txt",
+            level=logging.ERROR,
+            format="%(asctime)s [%(levelname)s]: %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
         # self.num_classes = 1
         super().__init__(
             root,
@@ -638,7 +645,7 @@ class MolDataset(MolDatasetAbstract):
                 check_exists=False,
                 keep_mol=False,
                 num_processes=self.num_processes,
-                #mol_dir=os.path.join(self.root, "molecules"),
+                # mol_dir=os.path.join(self.root, "molecules"),
                 **self.kwargs,
             )
             mol = tautomers.lowest_tautomer
