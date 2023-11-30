@@ -60,7 +60,7 @@ The general flags that can be used are:
 Qupkake has 2 types of inputs that can be used to run the program:
 ### 1. A single molecule as a SMILES string:
 ```bash
-> qupkake smiles "SMILES"
+$ qupkake smiles "SMILES"
 ```
 Specific flags for this input type are:
 ```bash
@@ -71,7 +71,7 @@ Specific flags for this input type are:
 
 ### 2. A CSV or SDF file containing multiple molecules
 ```bash
-> qupkake file <filename>
+$ qupkake file <filename>
 ```
 
 Specific flags for this input type are:
