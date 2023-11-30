@@ -192,7 +192,7 @@ def main_smiles(args):
     run_pipeline(args)
 
 
-def smiles_to_sdf(smiles, name, root) -> None:
+def smiles_to_sdf(smiles: str, name: str, root: str) -> None:
     """
     Converts a SMILES string to a SDF file.
 

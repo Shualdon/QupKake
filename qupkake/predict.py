@@ -149,7 +149,9 @@ def predict_sites(dataset: MolDataset, model: SitesPrediction) -> list:
     )
 
     sites_predictions = trainer.predict(model, DataLoader(dataset, batch_size=1))
-    sites_indices = [x.squeeze().nonzero().reshape(-1) for x in sites_predictions]
+    sites_indices = [
+        x.squeeze().nonzero().reshape(-1).tolist() for x in sites_predictions
+    ]
     return sites_indices
 
 
@@ -204,12 +206,12 @@ def make_sites_prediction_files(
         data_dict["name"] = data.name
         for i in prot_idx:
             prot_dict = data_dict.copy()
-            prot_dict["idx"] = i.item()
+            prot_dict["idx"] = i
             prot_dict["pka_type"] = "acidic"
             mol_list.append(prot_dict)
         for i in deprot_idx:
             deprot_dict = data_dict.copy()
-            deprot_dict["idx"] = i.item()
+            deprot_dict["idx"] = i
             deprot_dict["pka_type"] = "basic"
             mol_list.append(deprot_dict)
     PandasTools.WriteSDF(
@@ -243,7 +245,7 @@ def run_prediction_pipeline(
     prot_model, deprot_model, pka_model = load_models()
     prot_indices = predict_sites(dataset, prot_model)
     deprot_indices = predict_sites(dataset, deprot_model)
-    if len(prot_indices) == 0 and len(deprot_indices) == 0:
+    if not any(prot_indices) and not any(deprot_indices):
         print("No protonation/deprotonation sites were found.")
         print("Output fill will not be created.")
     else:
@@ -276,5 +278,5 @@ def run_prediction_pipeline(
             idName=name_col,
             properties=["idx", "pka_type", "pka"],
         )
-
+        os.remove(f"{root}/raw/{output}")
         print(f"Predictions saved to {root}/output/{output}")
