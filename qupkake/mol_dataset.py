@@ -346,7 +346,7 @@ class MolPairDataset(MolDatasetAbstract):
     def _process_chunk(self, chunk) -> pd.DataFrame:
         """Processing a chunk of data from the dataframe"""
         bad_idx = []
-        for index, row in tqdm(chunk.iterrows(), total=len(chunk)):
+        for index, row in tqdm(chunk.iterrows(), total=len(chunk), position=0):
             file_name = (
                 f"{row[self.name_col]}_{row[self.idx_col]}_{row[self.type_col]}_pair.pt"
             )
@@ -659,7 +659,7 @@ class MolDataset(MolDatasetAbstract):
 
     def _process_chunk(self, chunk) -> pd.DataFrame:
         self.data_list = []
-        pbar = tqdm(chunk.iterrows(), total=len(chunk))
+        pbar = tqdm(chunk.iterrows(), total=len(chunk), position=0)
         for index, row in pbar:
             pbar.set_description("Processing %s" % row[self.name_col])
             try:

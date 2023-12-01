@@ -150,7 +150,7 @@ class Tautomerize:
         #os.makedirs(self.mol_dir, exist_ok=True)
         tautomer_energy = []
         with tempfile.TemporaryDirectory() as tmpdirname:
-            pbar = tqdm(enumerate(self.tautomers), total=len(self.tautomers))
+            pbar = tqdm(enumerate(self.tautomers), total=len(self.tautomers), leave=False, position=1)
             for i, taut in pbar:
                 pbar.set_description(f"Processing {self.name} tautomer {i}")
                 taut_file = f"{tmpdirname}/{self.name}_t{i}.mol"
