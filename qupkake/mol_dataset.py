@@ -22,6 +22,7 @@ RDLogger.DisableLog("rdApp.*")
 
 logger = logging.getLogger(__name__)
 
+
 class MolPairData(Data):
     """Representation of a pair of molecules."""
 
@@ -126,8 +127,6 @@ class MolDatasetAbstract(Dataset, ABC):
             self.data.to_csv(self.raw_paths[0], index=False)
 
     def _embed_mol(self, row):
-        if row.name % 1000 == 0:
-            print(f"Embedding molecule {row.name}")
         mol = row[self.mol_col]
         mol = Chem.AddHs(mol)
         try:
@@ -160,7 +159,7 @@ class MolDatasetAbstract(Dataset, ABC):
             molColName=self.mol_col,
             smilesName=self.smiles_col,
             embedProps=True,
-            isomericSmiles=False,
+            isomericSmiles=True,
             removeHs=False,
         )
         return datafile.astype(self._col_types(datafile))
@@ -236,7 +235,7 @@ class MolDatasetAbstract(Dataset, ABC):
     def _process_chunk(self, chunk):
         pass
 
- 
+
 class MolPairDataset(MolDatasetAbstract):
     """A dataset of pairs of molecules
 
@@ -295,7 +294,6 @@ class MolPairDataset(MolDatasetAbstract):
         self.other_cols = other_cols
         self.mp = mp
         self.kwargs = kwargs
-        
 
         # root: str,
         # filename: str,
@@ -611,7 +609,7 @@ class MolDataset(MolDatasetAbstract):
             mol = Chem.AddHs(mol, addCoords=True)
 
         AllChem.MMFFOptimizeMolecule(mol)
-        mol = Chem.RemoveHs(mol)
+        # mol = Chem.RemoveHs(mol)
         return mol
 
     def _get_graph(self, row):

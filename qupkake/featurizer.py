@@ -452,7 +452,7 @@ class Featurizer:
         """Sets features lengths."""
         self.n_node_features = 0
         for key, value in ATOM_FEATURES.items():
-            if self.xtb == False and "xTB" in key:
+            if self.xtb is False and "xTB" in key:
                 pass
             else:
                 if value[0]:

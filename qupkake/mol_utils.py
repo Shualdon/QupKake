@@ -5,7 +5,7 @@ import shutil
 import tempfile
 import traceback
 from copy import deepcopy
-from typing import  List, Optional,  Union
+from typing import List, Optional, Union
 
 from rdkit import Chem
 from rdkit.Chem import AllChem
@@ -123,8 +123,9 @@ class Tautomerize:
     def set_tautomers(self) -> List[Chem.Mol]:
         """Create list of possible tautomers"""
         enumerator = rdMolStandardize.TautomerEnumerator()
-        enumerator.Canonicalize(self.mol)
-        tauts = enumerator.Enumerate(self.mol)
+        # enumerator.Canonicalize(self.mol)
+        tauts = enumerator.Enumerate(Chem.RemoveHs(self.mol))
+        tauts = [Chem.AddHs(x, addCoords=True) for x in tauts]
         return tauts
 
     def get_tautomers(self, smiles: bool = False) -> List[Union[str, Chem.Mol]]:
@@ -146,11 +147,24 @@ class Tautomerize:
 
     def make_tautomer_files(self) -> None:
         """Create tautomer files, run GNF2-xTB, and parse the total energy"""
+        if len(self.tautomers) == 1:
+            self.lowest_tautomer = self.tautomers[0]
+            self.lowest_tautomer_num = 0
+            self.lowest_tautomer_energy = 0.0
+            self.lowest_tautomer_name = f"{self.name}_t{self.lowest_tautomer_num}"
+            return
+
         from tqdm import tqdm
-        #os.makedirs(self.mol_dir, exist_ok=True)
+
+        # os.makedirs(self.mol_dir, exist_ok=True)
         tautomer_energy = []
         with tempfile.TemporaryDirectory() as tmpdirname:
-            pbar = tqdm(enumerate(self.tautomers), total=len(self.tautomers), leave=False, position=1)
+            pbar = tqdm(
+                enumerate(self.tautomers),
+                total=len(self.tautomers),
+                leave=False,
+                position=1,
+            )
             for i, taut in pbar:
                 pbar.set_description(f"Processing {self.name} tautomer {i}")
                 taut_file = f"{tmpdirname}/{self.name}_t{i}.mol"

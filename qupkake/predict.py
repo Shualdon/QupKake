@@ -199,6 +199,7 @@ def make_sites_prediction_files(
     Returns:
         None
     """
+
     mol_list = []
     for data, prot_idx, deprot_idx in zip(dataset, prot_indices, deprot_indices):
         data_dict = {}
@@ -278,5 +279,5 @@ def run_prediction_pipeline(
             idName=name_col,
             properties=["idx", "pka_type", "pka"],
         )
-        os.remove(f"{root}/raw/{output}")
+        #os.remove(f"{root}/raw/{output}")
         print(f"Predictions saved to {root}/output/{output}")

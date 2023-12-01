@@ -16,6 +16,9 @@ class MyParser(argparse.ArgumentParser):
     Overriden to show help on default.
     """
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def error(self, message):
         print(f"error: {message}")
         self.print_help()
@@ -347,6 +350,7 @@ def parse_arguments(args):
     parser_file = subparsers.add_parser(
         "file",
         help="Predict pKa values for molecules in a CSV or SDF file",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         parents=[gen_parser],
     )
     parser_file.add_argument("filename", help="Input file (CSV or SDF)")
@@ -371,6 +375,7 @@ def parse_arguments(args):
     parser_smiles = subparsers.add_parser(
         "smiles",
         help="Predict pKa values for a SMILES string",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=["smi"],
         parents=[gen_parser],
     )
