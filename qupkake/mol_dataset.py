@@ -20,6 +20,7 @@ from .mol_utils import Tautomerize
 
 RDLogger.DisableLog("rdApp.*")
 
+logger = logging.getLogger(__name__)
 
 class MolPairData(Data):
     """Representation of a pair of molecules."""
@@ -94,6 +95,14 @@ class MolDatasetAbstract(Dataset, ABC):
         )
         self.data = None
         self.data_list = []
+
+        # logging.basicConfig(
+        #     filename=f"{root}/logs/error_log.txt",
+        #     level=logging.ERROR,
+        #     format="%(asctime)s [%(levelname)s]: %(message)s",
+        #     datefmt="%Y-%m-%d %H:%M:%S",
+        # )
+
         super().__init__(root, transform, pre_transform, **kwargs)
 
     def _read_file(self, embed=False):
@@ -209,9 +218,9 @@ class MolDatasetAbstract(Dataset, ABC):
 
     def _handle_processing_error(self, row, error):
         """Handle errors during processing"""
-        logging.error(f"Error processing row {row.name}")
-        logging.error(f"Error: {error}")
-        logging.error(traceback.format_exc())
+        logger.error(f"Error processing row {row.name}")
+        logger.error(f"Error: {error}")
+        logger.error(traceback.format_exc())
 
     def _save_processed_data(self, file_name, data):
         """Save processed data to file"""
@@ -227,7 +236,7 @@ class MolDatasetAbstract(Dataset, ABC):
     def _process_chunk(self, chunk):
         pass
 
-
+ 
 class MolPairDataset(MolDatasetAbstract):
     """A dataset of pairs of molecules
 
@@ -286,12 +295,7 @@ class MolPairDataset(MolDatasetAbstract):
         self.other_cols = other_cols
         self.mp = mp
         self.kwargs = kwargs
-        logging.basicConfig(
-            filename="error_log.txt",
-            level=logging.ERROR,
-            format="%(asctime)s [%(levelname)s]: %(message)s",
-            datefmt="%Y-%m-%d %H:%M:%S",
-        )
+        
 
         # root: str,
         # filename: str,
@@ -554,13 +558,6 @@ class MolDataset(MolDatasetAbstract):
         self.other_cols = other_cols
         self.mp = mp
         self.kwargs = kwargs
-
-        logging.basicConfig(
-            filename="error_log.txt",
-            level=logging.ERROR,
-            format="%(asctime)s [%(levelname)s]: %(message)s",
-            datefmt="%Y-%m-%d %H:%M:%S",
-        )
         # self.num_classes = 1
         super().__init__(
             root,

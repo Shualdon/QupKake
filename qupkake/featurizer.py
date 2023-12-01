@@ -1,11 +1,9 @@
 import ast
 import glob
-import os
-import pathlib
-import shutil
-import tempfile
-from abc import ABC, abstractmethod
-from typing import Any, List, Tuple, Union
+import logging
+import traceback
+from abc import ABC
+from typing import Any, Tuple, Union
 
 import numpy as np
 import torch
@@ -15,6 +13,8 @@ from rdkit.Chem.rdmolops import GetAdjacencyMatrix
 from torch_geometric.data import Data
 
 from .xtbp import XTBP, RunXTB
+
+logger = logging.getLogger(__name__)
 
 ATOM_LIST = [
     "C",
@@ -494,17 +494,21 @@ class Featurizer:
     def get_xtb_attributes(self) -> dict:
         """Compute xTB-GFN2 attributes."""
         if self.xtb:
-            xtb_out = RunXTB(
-                self.mol, f"--opt --alpb water --lmo -P {self.num_processes}"
-            )
-            xtbp = XTBP(xtb_out())
-            mol_attributes = xtbp()
+            try:
+                xtb_out = RunXTB(
+                    self.mol, f"--opt --alpb water --lmo -P {self.num_processes}"
+                )
+                xtbp = XTBP(xtb_out())
+                mol_attributes = xtbp()
 
-            #self.mol = xtb_out.get_opt_mol()
+                # self.mol = xtb_out.get_opt_mol()
 
-            fukui_out = RunXTB(self.mol, "--vfukui")
-            fukui = XTBP(fukui_out())
-            mol_attributes["atomprop"]["fukui"] = fukui["atomprop"]["fukui"]
+                fukui_out = RunXTB(self.mol, "--vfukui")
+                fukui = XTBP(fukui_out())
+                mol_attributes["atomprop"]["fukui"] = fukui["atomprop"]["fukui"]
+            except Exception as e:
+                self._handle_processing_error(e)
+                mol_attributes = {}
         else:
             mol_attributes = {}
         return mol_attributes
@@ -555,7 +559,7 @@ class Featurizer:
             for key, value in self.kwargs.items():
                 self.kwargs[key] = self.convert_strings_func(value)
         if self.idx_to_list and self.y:
-            idx_lst = np.zeros(n_nodes)
+            idx_lst = np.zeros(self.mol.GetNumAtoms())
             if self.exclude_atom:
                 if isinstance(self.exclude_atom, int):
                     for x in self.y:
@@ -610,6 +614,12 @@ class Featurizer:
         data = self.process_additional_kwargs(data, mol_attributes)
 
         return data
+
+    def _handle_processing_error(self, error) -> None:
+        """Handle errors during processing"""
+        logger.error(f"Error processing {self.name}")
+        logger.error(f"Error: {error}")
+        logger.error(traceback.format_exc())
 
     # def set_graph(self) -> Data:
     #     """Create a Pytorch Geometric Data object from smiles"""

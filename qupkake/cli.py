@@ -1,9 +1,14 @@
 import argparse
+import logging
 import sys
 
 from ._version import get_versions
 
 __version__ = get_versions()["version"]
+
+del get_versions
+
+logger = logging.getLogger(__name__)
 
 
 class MyParser(argparse.ArgumentParser):
@@ -156,6 +161,18 @@ def check_output_file(filename: str, root: str) -> str:
     return filename + ".sdf"
 
 
+def set_logging(args) -> None:
+    """
+    Sets up logging.
+    """
+    logging.basicConfig(
+        filename=f"{args.root}/logs/error_log.txt",
+        level=logging.ERROR,
+        format="%(asctime)s [%(levelname)s]: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
+
 def main_file(args):
     """
     Predicts the pKa values for a list of molecules in a CSV or SDF file.
@@ -167,6 +184,7 @@ def main_file(args):
     """
 
     create_dirs(args)
+    set_logging(args)
     args.filename = process_file(
         args.filename, args.smiles_col, args.name_col, args.root
     )
@@ -185,6 +203,7 @@ def main_smiles(args):
     """
 
     create_dirs(args)
+    set_logging(args)
     smiles_to_sdf(args.smiles, args.name, args.root)
     args.filename = args.name + ".sdf"
     args.mol_col = "ROMol"
@@ -239,7 +258,7 @@ def create_dirs(args):
     dirs = [
         os.path.join(root, "raw"),
         os.path.join(root, "processed"),
-        #os.path.join(root, "molecules"),
+        os.path.join(root, "logs"),
         os.path.join(root, "output"),
     ]
 
@@ -250,6 +269,12 @@ def create_dirs(args):
     if os.listdir(dirs[1]):
         for f in os.listdir(dirs[1]):
             os.remove(os.path.join(dirs[1], f))
+
+    # if logs is not empty, delete all files in logs
+    if os.listdir(dirs[2]):
+        for f in os.listdir(dirs[2]):
+            os.remove(os.path.join(dirs[2], f))
+
 
 def run_pipeline(args):
     """
