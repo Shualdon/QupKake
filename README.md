@@ -26,6 +26,13 @@ Chemistry for micro-pKa Predictions]().
 We recommend using [conda](https://docs.conda.io/en/latest/) to install QupKake.
 
 ## Option 1
+
+Clone the repository:
+```bash
+git clone https://github.com/Shualdon/QupKake.git
+cd qupkake
+```
+
 Create a conda environment from the environment.yml file:
 ```bash
 conda env create -f environment.yml
@@ -33,8 +40,12 @@ conda activate qupkake
 ```
 This will create a conda environment with all the dependencies installed.
 
+Install the package:
+```bash
+pip install .
+```
+
 ## Option 2
-Manual installation:
 
 Create a conda environment:
 ```bash
