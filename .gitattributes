@@ -1,1 +1,2 @@
 qupkake/_version.py export-subst
+.csv filter=lfs diff=lfs merge=lfs -text
