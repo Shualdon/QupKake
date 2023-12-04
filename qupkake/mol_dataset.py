@@ -186,6 +186,7 @@ class MolDatasetAbstract(Dataset, ABC):
     def _get_data(self, embed: bool):
         if self.data is not None:
             if self.mol_col in self.data.columns and not embed:
+                print("returning data from self.data")
                 return self.data
 
         self.data = self._read_file(embed)
@@ -204,7 +205,6 @@ class MolDatasetAbstract(Dataset, ABC):
     def process(self):
         """Process the dataset to the processed data folder."""
         self.data = self._get_data(embed=True)
-
         if self.mp:
             chunks = np.array_split(self.data, self.num_processes)
             with Pool(self.num_processes) as pool:
@@ -361,7 +361,6 @@ class MolPairDataset(MolDatasetAbstract):
             except Exception as e:
                 bad_idx.append(index)
                 self._handle_processing_error(row, e)
-
         chunk = chunk.drop(bad_idx).reset_index(drop=True)
         # return the chunk
         return chunk
@@ -382,6 +381,7 @@ class MolPairDataset(MolDatasetAbstract):
                 tries -= 1
                 if tries == 0:
                     self._handle_retry_error(row, e)
+                    raise (Exception("Error processing row"))
 
     def _handle_retry_error(self, row, error):
         """Handle errors during retry attempts"""
@@ -484,7 +484,7 @@ class MolPairDataset(MolDatasetAbstract):
             return mol_pair
         except Exception as e:
             self._handle_processing_error(row, e)
-            pass
+            raise (Exception("Error processing row"))
 
     def _get_label(self, label):
         label = np.asarray([label])
@@ -657,22 +657,56 @@ class MolDataset(MolDatasetAbstract):
 
     def _process_chunk(self, chunk) -> pd.DataFrame:
         self.data_list = []
+        bad_idx = []
         pbar = tqdm(chunk.iterrows(), total=len(chunk), position=0)
         for index, row in pbar:
             pbar.set_description("Processing %s" % row[self.name_col])
+            if self.data_name:
+                file_name = f"{row[self.name_col]}_{self.data_name}.pt"
+            else:
+                file_name = f"{row[self.name_col]}.pt"
             try:
-                data = self._get_graph(row)
-                self.data_list.append(data)
-                if self.data_name:
-                    file_name = f"{row[self.name_col]}_{self.data_name}.pt"
+                if not os.path.exists(
+                    os.path.join(
+                        self.processed_dir,
+                        file_name,
+                    )
+                ):
+                    self._process_row_with_retry(row)
                 else:
-                    file_name = f"{row[self.name_col]}.pt"
-                self._save_processed_data(file_name, data)
+                    self._load_processed_data(file_name)
             except Exception as e:
+                bad_idx.append(index)
                 self._handle_processing_error(row, e)
                 pass
 
+        chunk = chunk.drop(bad_idx).reset_index(drop=True)
         return chunk
+
+    def _process_row_with_retry(self, row):
+        """Process a row with retry mechanism"""
+        if self.data_name:
+            file_name = f"{row[self.name_col]}_{self.data_name}.pt"
+        else:
+            file_name = f"{row[self.name_col]}.pt"
+        tries = 5
+        while tries > 0:
+            try:
+                data = self._get_graph(row)
+                self.data_list.append(data)
+                self._save_processed_data(file_name, data)
+                break
+            except Exception as e:
+                tries -= 1
+                if tries == 0:
+                    self._handle_retry_error(row, e)
+                    raise (Exception("Error processing row"))
+
+    def _handle_retry_error(self, row, error):
+        """Handle errors during retry attempts"""
+        logging.error(f"{row.name} failed all 5 retry attempts")
+        logging.error(f"Error: {error}")
+        logging.error(traceback.format_exc())
 
     def _get_label(self, label):
         label = np.asarray([label])
