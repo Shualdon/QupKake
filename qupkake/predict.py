@@ -21,6 +21,7 @@ warnings.filterwarnings(
 )
 
 warnings.filterwarnings("ignore", ".*If your intention is to run Lightning on SLURM*")
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 log = logging.getLogger("pytorch_lightning")
 log.propagate = False

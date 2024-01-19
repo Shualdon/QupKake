@@ -206,13 +206,15 @@ class MolDatasetAbstract(Dataset, ABC):
         """Process the dataset to the processed data folder."""
         self.data = self._get_data(embed=True)
         if self.mp:
+
+            L = list(range(self.num_processes))[::-1]
             chunks = np.array_split(self.data, self.num_processes)
             with Pool(self.num_processes) as pool:
                 self.data = pd.concat(
-                    pool.map(self._process_chunk, chunks), ignore_index=True
+                    pool.starmap(self._process_chunk, zip(chunks, L)), ignore_index=True
                 )
         else:
-            self.data = self._process_chunk(self.data)
+            self.data = self._process_chunk(self.data, 0)
         self._save_file()
 
     def _handle_processing_error(self, row, error):
@@ -341,10 +343,13 @@ class MolPairDataset(MolDatasetAbstract):
             )
         ]
 
-    def _process_chunk(self, chunk) -> pd.DataFrame:
+    def _process_chunk(self, chunk, chunk_pos) -> pd.DataFrame:
         """Processing a chunk of data from the dataframe"""
         bad_idx = []
-        for index, row in tqdm(chunk.iterrows(), total=len(chunk), position=0):
+        pbar = tqdm(chunk.iterrows(), total=len(chunk), position=chunk_pos)
+        for index, row in pbar:
+            pbar.set_description("Processing %s" % row[self.name_col])
+ 
             file_name = (
                 f"{row[self.name_col]}_{row[self.idx_col]}_{row[self.type_col]}_pair.pt"
             )
@@ -655,10 +660,10 @@ class MolDataset(MolDatasetAbstract):
         )
         return mol_data.data
 
-    def _process_chunk(self, chunk) -> pd.DataFrame:
+    def _process_chunk(self, chunk, chunk_pos) -> pd.DataFrame:
         self.data_list = []
         bad_idx = []
-        pbar = tqdm(chunk.iterrows(), total=len(chunk), position=0)
+        pbar = tqdm(chunk.iterrows(), total=len(chunk), position=chunk_pos)
         for index, row in pbar:
             pbar.set_description("Processing %s" % row[self.name_col])
             if self.data_name:
