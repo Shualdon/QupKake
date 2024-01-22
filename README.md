@@ -11,7 +11,7 @@ QupKake - Predict micro-pKa of organic molecules
 <br>
 
 QupKake combines [GFN2-xTB](https://github.com/grimme-lab/xtb) calculations with graph-neural-networks to accurately predict micro-pKa values of organic molecules. It is part of the paper: [QupKake: Integrating Machine Learning and Quantum
-Chemistry for micro-pKa Predictions](https://chemrxiv.org/engage/chemrxiv/article-details/656cd67c5bc9fcb5c9f61f8a).
+Chemistry for micro-pKa Predictions](https://doi.org/10.26434/chemrxiv-2023-gxplb).
 
 # Requirements
 * Python >= 3.9
@@ -19,7 +19,7 @@ Chemistry for micro-pKa Predictions](https://chemrxiv.org/engage/chemrxiv/articl
 * pytorch_geometric >= 2.3.0
 * pytorch_lightning >= 2.0.2
 * rdkit >= 2022.03.03
-* xTB == 2.4.1
+* xtb == 6.4.1
 
 # Installation
 
@@ -53,12 +53,6 @@ conda create -n qupkake python=3.9
 conda activate qupkake
 ```
 
-`xtb` needs to be installed using conda:
-```bash
-conda install -c conda-forge xtb==6.4.1
-```
-See [xtb Installation](#xtb-installation) below for other installation options.
-
 Clone the repository and install using pip:
 ```bash
 git clone https://github.com/Shualdon/QupKake.git
@@ -69,14 +63,13 @@ This will install the package and all the rest of the dependencies.
 
 ## `xtb` Installation
 
-Optionally, `xtb` can be installed from [source](https://github.com/grimme-lab/xtb/releases/tag/v6.4.1), and the path to the executable can be set up:
+Due to bugs in the conda version of `xtb`, it should be installed from [source](https://github.com/grimme-lab/xtb/releases/tag/v6.4.1), and the path to the executable should be set up before running QupKake:
 ```bash
 export XTBPATH=/path/to/xtb/executable
 ```
-This be used even if `xtb` is installed using conda.
+Follow the [xtb documentation](https://xtb-docs.readthedocs.io/en/latest/setup.html#setting-up-xtb) for more information.
 
-
-The linux binaries of `xtb` come with the package and will be used by default if the neither the conda package or the `$XTB_PATH` environment variable are set up.
+The linux binaries of `xtb` come with the package and will be used by default if the neither the conda package or the `$XTBPATH` environment variable are set up.
 
 # Usage
 Qupkake can be used as a Python package or as a command line tool. This gives the user the flexibility to use the package in their own code or to use it as a stand-alone tool. 
@@ -129,9 +122,15 @@ Specific flags for this input type are:
 If to use this package in your research, please cite the following paper:
 
 ### Bibtex
+
 ```bibtex
-@article{
-    ...
+@article{qupkake, 
+    title={QupKake: Integrating Machine Learning and Quantum Chemistry for micro-pKa Predictions}, 
+    DOI={10.26434/chemrxiv-2023-gxplb}, 
+    journal={ChemRxiv}, 
+    publisher={Cambridge Open Engage}, 
+    author={Abarbanel, Omri and Hutchison, Geoffrey}, 
+    year={2023}
 }
 ```
 

@@ -14,7 +14,7 @@ dependencies:
   - numpy
   - scipy
   - rdkit=2022.03.03
-  - xtb==6.4.1
+  # - xtb==6.4.1
 
   - pip:
     - torch_geometric==2.4

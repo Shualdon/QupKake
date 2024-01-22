@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Abarbanel"
+  given-names: "Omri"
+  orcid: "https://orcid.org/0000-0003-2299-4176"
+- family-names: "Hutchison"
+  given-names: "Groffrey"
+  orcid: "https://orcid.org/0000-0002-1757-1980"
+title: "QupKake: Integrating Machine Learning and Quantum Chemistry for micro-pKa Predictions"
+url: "https://github.com/Shualdon/QupKake"
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Abarbanel"
+    given-names: "Omri"
+    orcid: "https://orcid.org/0000-0003-2299-4176"
+  - family-names: "Hutchison"
+    given-names: "Groffrey"
+    orcid: "https://orcid.org/0000-0002-1757-1980"
+  doi: "10.26434/chemrxiv-2023-gxplb"
+  journal: "ChemRxiv"
+  publisher: "Cambridge Open Engage", 
+  title: "QupKake: Integrating Machine Learning and Quantum Chemistry for micro-pKa Predictions"
+  year: 2023
