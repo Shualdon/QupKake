@@ -10,8 +10,8 @@ QupKake - Predict micro-pKa of organic molecules
 </p>
 <br>
 
-QupKake combines [GFN2-xTB](https://github.com/grimme-lab/xtb) calculations with graph-neural-networks to accuretly predict micro-pKa values of organic molecules. It is part of the paper: [QupKake: Integrating Machine Learning and Quantum
-Chemistry for micro-pKa Predictions]().
+QupKake combines [GFN2-xTB](https://github.com/grimme-lab/xtb) calculations with graph-neural-networks to accurately predict micro-pKa values of organic molecules. It is part of the paper: [QupKake: Integrating Machine Learning and Quantum
+Chemistry for micro-pKa Predictions](https://chemrxiv.org/engage/chemrxiv/article-details/656cd67c5bc9fcb5c9f61f8a).
 
 # Requirements
 * Python >= 3.9
@@ -76,14 +76,14 @@ export XTBPATH=/path/to/xtb/executable
 This be used even if `xtb` is installed using conda.
 
 
-The linux binaries of `xtb` come with the package and will be used by default if the neither the conda package or the `$XTB_PATH` enviroment variable are set up.
+The linux binaries of `xtb` come with the package and will be used by default if the neither the conda package or the `$XTB_PATH` environment variable are set up.
 
 # Usage
-Qupkake can be used as a python package or as a command line tool. This gives the user the flexibility to use the package in their own code or to use it as a stand-alone tool. 
+Qupkake can be used as a Python package or as a command line tool. This gives the user the flexibility to use the package in their own code or to use it as a stand-alone tool. 
 
 ## Command line
 
-Once installed, QupKake can be used as a command line tool. The general syntext for running the program is:
+Once installed, QupKake can be used as a command line tool. The general syntax for running the program is:
 ```bash
 $ qupkake <input_type> <input> <flags>
 ```
@@ -93,7 +93,7 @@ The general flags that can be used are:
 
 -t, --tautomerize: Find the most stable tautomer for the molecule(s) Default: False
 
--mp [N], --multiprocessing [N]: Use Multiprocessing. True if used alone. If followed by a number, its will use that number of suprocesses. (default: False)
+-mp [N], --multiprocessing [N]: Use Multiprocessing. True if used alone. If followed by a number, it will use that number of subprocesses. (default: False)
 ```
 
 Qupkake has 2 types of inputs that can be used to run the program:
