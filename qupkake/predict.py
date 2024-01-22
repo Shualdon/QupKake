@@ -268,7 +268,6 @@ def run_prediction_pipeline(
             embedProps=True,
             removeHs=False,
             includeFingerprints=False,
-            idName=name_col,
             molColName="ROMol",
         )
         df["pka"] = pka_predictions
@@ -280,4 +279,5 @@ def run_prediction_pipeline(
             idName=name_col,
             properties=["idx", "pka_type", "pka"],
         )
+        os.remove(f"{root}/raw/{output}")
         print(f"Predictions saved to {root}/output/{output}")
