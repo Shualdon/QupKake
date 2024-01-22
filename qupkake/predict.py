@@ -21,7 +21,7 @@ warnings.filterwarnings(
 )
 
 warnings.filterwarnings("ignore", ".*If your intention is to run Lightning on SLURM*")
-warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action="ignore", category=FutureWarning)
 
 log = logging.getLogger("pytorch_lightning")
 log.propagate = False
@@ -280,5 +280,4 @@ def run_prediction_pipeline(
             idName=name_col,
             properties=["idx", "pka_type", "pka"],
         )
-        #os.remove(f"{root}/raw/{output}")
         print(f"Predictions saved to {root}/output/{output}")
