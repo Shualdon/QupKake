@@ -209,12 +209,12 @@ def make_sites_prediction_files(
         for i in prot_idx:
             prot_dict = data_dict.copy()
             prot_dict["idx"] = i
-            prot_dict["pka_type"] = "acidic"
+            prot_dict["pka_type"] = "basic"
             mol_list.append(prot_dict)
         for i in deprot_idx:
             deprot_dict = data_dict.copy()
             deprot_dict["idx"] = i
-            deprot_dict["pka_type"] = "basic"
+            deprot_dict["pka_type"] = "acidic"
             mol_list.append(deprot_dict)
     PandasTools.WriteSDF(
         pd.DataFrame(mol_list),
@@ -249,7 +249,7 @@ def run_prediction_pipeline(
     deprot_indices = predict_sites(dataset, deprot_model)
     if not any(prot_indices) and not any(deprot_indices):
         print("No protonation/deprotonation sites were found.")
-        print("Output fill will not be created.")
+        print("Output file will not be created.")
     else:
         make_sites_prediction_files(root, dataset, prot_indices, deprot_indices, output)
         pair_dataset = load_mol_pair_dataset(

@@ -206,7 +206,6 @@ class MolDatasetAbstract(Dataset, ABC):
         """Process the dataset to the processed data folder."""
         self.data = self._get_data(embed=True)
         if self.mp:
-
             L = list(range(self.num_processes))[::-1]
             chunks = np.array_split(self.data, self.num_processes)
             with Pool(self.num_processes) as pool:
@@ -349,7 +348,7 @@ class MolPairDataset(MolDatasetAbstract):
         pbar = tqdm(chunk.iterrows(), total=len(chunk), position=chunk_pos)
         for index, row in pbar:
             pbar.set_description("Processing %s" % row[self.name_col])
- 
+
             file_name = (
                 f"{row[self.name_col]}_{row[self.idx_col]}_{row[self.type_col]}_pair.pt"
             )
@@ -623,7 +622,7 @@ class MolDataset(MolDatasetAbstract):
         smiles = row[self.smiles_col]
 
         mol = (
-            row[self.mol_col]
+            self.opt_mol(row[self.mol_col])
             if self.mol_col in row
             else self.opt_mol(Chem.MolFromSmiles(smiles))
         )
