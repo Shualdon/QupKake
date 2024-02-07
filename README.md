@@ -119,7 +119,7 @@ Specific flags for this input type are:
  TBA
 
 # Citation
-If to use this package in your research, please cite the following paper:
+If you use this package in your research or application, please cite the following paper:
 
 ### Bibtex
 
