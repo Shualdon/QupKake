@@ -146,7 +146,7 @@ class RunXTB:
             filepath = os.path.join(tmpdirname, os.path.basename(self.mol_file))
             try:
                 process = run(
-                    [XTB_LOCATION, filepath, self.options],
+                    [XTB_LOCATION, filepath] + self.options.split(),
                     stdout=PIPE,
                     stderr=PIPE,
                     encoding="utf-8",

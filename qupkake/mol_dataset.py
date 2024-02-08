@@ -407,7 +407,7 @@ class MolPairDataset(MolDatasetAbstract):
             atom.SetFormalCharge(charge + 1)
             atom.SetNumExplicitHs(exp_hs + 1)
         # If acidic
-        elif pka_type == self.type_values[0]:
+        elif pka_type == self.type_values[1]:
             # Fixing caboxylic acids index
             carb_acid = Chem.MolFromSmarts("[OH]C=O")
             for match in conjugate.GetSubstructMatches(carb_acid):
@@ -422,10 +422,11 @@ class MolPairDataset(MolDatasetAbstract):
                     break
             atom = conjugate.GetAtomWithIdx(atom_index)
             charge = atom.GetFormalCharge()
-            exp_hs = atom.GetNumExplicitHs()
+            old_exp_hs = atom.GetNumExplicitHs()
             atom.SetFormalCharge(charge - 1)
-            if exp_hs > 0:
-                atom.SetNumExplicitHs(exp_hs + 1)
+            new_exp_hs = atom.GetNumExplicitHs()
+            if old_exp_hs == new_exp_hs and new_exp_hs > 0:
+                atom.SetNumExplicitHs(new_exp_hs - 1)
 
         conjugate.UpdatePropertyCache(strict=True)
         conjugate = Chem.AddHs(conjugate, addCoords=True)
