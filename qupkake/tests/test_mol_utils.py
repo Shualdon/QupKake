@@ -35,11 +35,11 @@ def test_init(example_tautomer):
     assert example_tautomer.keep_mol is True
     assert example_tautomer.check_exists is True
     assert example_tautomer.num_processes == 1
-    assert example_tautomer.lowest_tautomer_path == "molecules/pytest_mol_t2.mol"
-    assert example_tautomer.lowest_tautomer_num == 2
+    assert example_tautomer.lowest_tautomer_path == "molecules/pytest_mol_t1.mol"
+    assert example_tautomer.lowest_tautomer_num == 1
     assert example_tautomer.lowest_tautomer_energy is not None
     assert example_tautomer.lowest_tautomer is not None
-    assert example_tautomer.lowest_tautomer_name == "pytest_mol_t2"
+    assert example_tautomer.lowest_tautomer_name == "pytest_mol_t1"
 
 
 def test_check_exist_mol(example_tautomer, tmp_path):
