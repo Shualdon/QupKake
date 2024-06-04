@@ -11,7 +11,7 @@ QupKake - Predict micro-pKa of organic molecules
 <br>
 
 QupKake combines [GFN2-xTB](https://github.com/grimme-lab/xtb) calculations with graph-neural-networks to accurately predict micro-pKa values of organic molecules. It is part of the paper: [QupKake: Integrating Machine Learning and Quantum
-Chemistry for micro-pKa Predictions](https://doi.org/10.26434/chemrxiv-2023-gxplb).
+Chemistry for micro-pKa Predictions](https://pubs.acs.org/doi/10.1021/acs.jctc.4c00328).
 
 # Requirements
 * Python >= 3.9
